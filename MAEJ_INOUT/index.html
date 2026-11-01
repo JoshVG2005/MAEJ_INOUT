@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Panel de control para administrar ingresos, gastos, equipos y resultados mensuales."
+    />
+    <title>Balanceo — Finanzas de tu empresa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <a class="brand" href="#" aria-label="Balanceo, inicio" data-nav="dashboard">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path d="M5 22.5 12.2 15l4.8 4 10-11" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M20.5 8H27v6.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span>MAEJ INOUT<span class="brand-period">.</span></span>
+        </a>
+
+        <div class="sidebar-label">MENÚ PRINCIPAL</div>
+        <nav class="main-nav" aria-label="Navegación principal">
+          <button class="nav-link active" type="button" data-nav="dashboard">
+            <span class="nav-icon" aria-hidden="true">⌂</span><span>Panel principal</span>
+          </button>
+          <button class="nav-link" type="button" data-nav="income">
+            <span class="nav-icon nav-icon-income" aria-hidden="true">↙</span><span>Ingresos</span>
+          </button>
+          <button class="nav-link" type="button" data-nav="expenses">
+            <span class="nav-icon nav-icon-expense" aria-hidden="true">↗</span><span>Gastos</span>
+          </button>
+          <button class="nav-link" type="button" data-nav="equipment">
+            <span class="nav-icon" aria-hidden="true">▦</span><span>Equipos</span>
+          </button>
+          <button class="nav-link" type="button" data-nav="summary">
+            <span class="nav-icon" aria-hidden="true">▤</span><span>Resumen mensual</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="help-card">
+            <span class="help-sparkle" aria-hidden="true">✦</span>
+            <strong>Tu negocio, en orden</strong>
+            <p>Registra cada movimiento y toma mejores decisiones.</p>
+            <button type="button" class="help-link" data-nav="summary">Ver mi resumen <span aria-hidden="true">→</span></button>
+          </div>
+          <div class="user-profile">
+            <div class="avatar" aria-hidden="true">ME</div>
+            <div class="user-copy"><strong>Mi empresa</strong><span>Administración</span></div>
+            <span class="profile-dots" aria-hidden="true">···</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <button class="mobile-menu" type="button" aria-label="Abrir menú" id="menu-toggle">☰</button>
+          <div class="breadcrumb"><span>Mi empresa</span><span class="breadcrumb-sep">/</span><strong id="breadcrumb-current">Panel principal</strong></div>
+          <div class="topbar-right">
+            <span class="today-label" id="today-label"></span>
+            <span class="topbar-avatar" aria-label="Perfil de Mi empresa">ME</span>
+          </div>
+        </header>
+
+        <div class="page-wrap">
+          <section class="page-section active" id="page-dashboard" aria-labelledby="dashboard-title">
+            <div class="page-heading heading-with-action">
+              <div>
+                <p class="eyebrow">VISTA GENERAL</p>
+                <h1 id="dashboard-title">Panel principal</h1>
+                <p class="page-subtitle">Así se mueve tu empresa. Aquí tienes el resumen de tus finanzas.</p>
+              </div>
+              <button class="button button-primary" type="button" data-nav="income"><span aria-hidden="true">＋</span> Registrar movimiento</button>
+            </div>
+
+            <div class="stats-grid">
+              <article class="stat-card">
+                <div class="stat-top"><span class="stat-label">Ingresos del mes</span><span class="stat-icon icon-green" aria-hidden="true">↙</span></div>
+                <strong class="stat-value" id="dashboard-income">$0</strong>
+                <span class="stat-foot"><span class="status-dot dot-green"></span> Total recibido este mes</span>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top"><span class="stat-label">Gastos del mes</span><span class="stat-icon icon-orange" aria-hidden="true">↗</span></div>
+                <strong class="stat-value" id="dashboard-expenses">$0</strong>
+                <span class="stat-foot"><span class="status-dot dot-orange"></span> Total gastado este mes</span>
+              </article>
+              <article class="stat-card">
+                <div class="stat-top"><span class="stat-label">Ganancia del mes</span><span class="stat-icon icon-purple" aria-hidden="true">✳</span></div>
+                <strong class="stat-value" id="dashboard-profit">$0</strong>
+                <span class="stat-foot"><span class="status-dot dot-purple"></span> Ingresos menos gastos</span>
+              </article>
+              <article class="stat-card investment-card">
+                <div class="stat-top"><span class="stat-label">Fondo de inversión</span><span class="stat-icon icon-blue" aria-hidden="true">◈</span></div>
+                <strong class="stat-value" id="dashboard-fund">$0</strong>
+                <button class="text-action" type="button" id="fund-toggle">Actualizar saldo <span aria-hidden="true">→</span></button>
+                <form class="fund-form hidden" id="fund-form">
+                  <label class="sr-only" for="fund-amount">Nuevo saldo del fondo de inversión</label>
+                  <input id="fund-amount" type="number" min="0" step="0.01" placeholder="Nuevo saldo" required />
+                  <button class="button button-small button-primary" type="submit">Guardar</button>
+                  <button class="icon-button" type="button" id="fund-cancel" aria-label="Cancelar">×</button>
+                </form>
+              </article>
+            </div>
+
+            <div class="dashboard-grid">
+              <section class="card movement-card">
+                <div class="card-heading">
+                  <div><h2>Últimos movimientos</h2><p>Tus ingresos y gastos más recientes</p></div>
+                  <button class="button button-quiet" type="button" data-nav="summary">Ver todos <span aria-hidden="true">→</span></button>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead><tr><th>Concepto</th><th>Fecha</th><th>Tipo</th><th class="align-right">Cantidad</th></tr></thead>
+                    <tbody id="recent-movements"></tbody>
+                  </table>
+                  <div class="empty-state hidden" id="recent-empty"><span class="empty-icon" aria-hidden="true">↗</span><strong>Aún no hay movimientos</strong><p>Cuando registres ingresos o gastos, aparecerán aquí.</p><button class="button button-outline" type="button" data-nav="income">Agregar el primero</button></div>
+                </div>
+              </section>
+              <section class="card quick-card">
+                <div class="card-heading"><div><h2>Accesos rápidos</h2><p>Registra algo nuevo</p></div></div>
+                <button class="quick-link" type="button" data-nav="income"><span class="quick-icon quick-green" aria-hidden="true">＋</span><span><strong>Agregar ingreso</strong><small>Registra dinero recibido</small></span><span class="quick-arrow" aria-hidden="true">→</span></button>
+                <button class="quick-link" type="button" data-nav="expenses"><span class="quick-icon quick-orange" aria-hidden="true">−</span><span><strong>Agregar gasto</strong><small>Registra un pago o compra</small></span><span class="quick-arrow" aria-hidden="true">→</span></button>
+                <button class="quick-link" type="button" data-nav="equipment"><span class="quick-icon quick-blue" aria-hidden="true">▦</span><span><strong>Agregar equipo</strong><small>Administra tus activos</small></span><span class="quick-arrow" aria-hidden="true">→</span></button>
+              </section>
+            </div>
+          </section>
+
+          <section class="page-section" id="page-income" aria-labelledby="income-title">
+            <div class="page-heading heading-with-action">
+              <div><p class="eyebrow">ENTRADAS DE DINERO</p><h1 id="income-title">Ingresos</h1><p class="page-subtitle">Registra y consulta el dinero que recibe tu empresa.</p></div>
+              <button class="button button-primary" type="button" data-form-toggle="income-form"><span aria-hidden="true">＋</span> Nuevo ingreso</button>
+            </div>
+            <section class="card form-card hidden" id="income-form-card">
+              <div class="card-heading"><div><h2 id="income-form-title">Registrar ingreso</h2><p>Completa los datos del movimiento.</p></div><button class="icon-button form-close" type="button" aria-label="Cerrar formulario">×</button></div>
+              <form id="income-form" class="entry-form">
+                <label>Fecha<input name="date" type="date" required /></label>
+                <label>Concepto<input name="concept" type="text" maxlength="80" placeholder="Ej. Venta de producto" required /></label>
+                <label>Cantidad<input name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required /></label>
+                <label>Método de pago<select name="method" required><option value="">Selecciona un método</option><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option><option>Depósito</option><option>Otro</option></select></label>
+                <label class="form-wide">Observaciones / nota<textarea name="notes" rows="2" maxlength="240" placeholder="Información adicional (opcional)"></textarea></label>
+                <div class="form-actions"><button class="button button-quiet form-cancel" type="button">Cancelar</button><button class="button button-primary" id="income-submit" type="submit">Guardar ingreso</button></div>
+              </form>
+            </section>
+            <section class="card list-card">
+              <div class="card-heading"><div><h2>Historial de ingresos</h2><p id="income-count">Todos tus ingresos registrados</p></div><div class="table-tools"><input class="search-input" type="search" data-search="income" placeholder="Buscar ingreso..." aria-label="Buscar ingreso" /></div></div>
+              <div class="table-wrap"><table><thead><tr><th>Concepto</th><th>Fecha</th><th>Método de pago</th><th>Nota</th><th class="align-right">Cantidad</th><th></th></tr></thead><tbody id="income-list"></tbody></table><div class="empty-state hidden" id="income-empty"><span class="empty-icon empty-green" aria-hidden="true">↙</span><strong>No hay ingresos todavía</strong><p>Agrega tu primer ingreso para comenzar el historial.</p><button class="button button-outline" type="button" data-form-toggle="income-form">Agregar ingreso</button></div></div>
+            </section>
+          </section>
+
+          <section class="page-section" id="page-expenses" aria-labelledby="expenses-title">
+            <div class="page-heading heading-with-action">
+              <div><p class="eyebrow">SALIDAS DE DINERO</p><h1 id="expenses-title">Gastos</h1><p class="page-subtitle">Lleva el control de los pagos y gastos de tu empresa.</p></div>
+              <button class="button button-primary" type="button" data-form-toggle="expense-form"><span aria-hidden="true">＋</span> Nuevo gasto</button>
+            </div>
+            <section class="card form-card hidden" id="expense-form-card">
+              <div class="card-heading"><div><h2 id="expense-form-title">Registrar gasto</h2><p>Completa los datos del movimiento.</p></div><button class="icon-button form-close" type="button" aria-label="Cerrar formulario">×</button></div>
+              <form id="expense-form" class="entry-form">
+                <label>Fecha<input name="date" type="date" required /></label>
+                <label>Concepto<input name="concept" type="text" maxlength="80" placeholder="Ej. Pago de internet" required /></label>
+                <label>Categoría<select name="category" required><option value="">Selecciona una categoría</option><option>Servicios</option><option>Nómina</option><option>Equipo</option><option>Inventario</option><option>Transporte</option><option>Renta</option><option>Marketing</option><option>Otro</option></select></label>
+                <label>Cantidad<input name="amount" type="number" min="0.01" step="0.01" placeholder="0.00" required /></label>
+                <label>Método de pago<select name="method" required><option value="">Selecciona un método</option><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option><option>Depósito</option><option>Otro</option></select></label>
+                <label class="form-wide">Observaciones / nota<textarea name="notes" rows="2" maxlength="240" placeholder="Información adicional (opcional)"></textarea></label>
+                <div class="form-actions"><button class="button button-quiet form-cancel" type="button">Cancelar</button><button class="button button-primary" id="expense-submit" type="submit">Guardar gasto</button></div>
+              </form>
+            </section>
+            <section class="card list-card">
+              <div class="card-heading"><div><h2>Historial de gastos</h2><p id="expense-count">Todos tus gastos registrados</p></div><div class="table-tools"><input class="search-input" type="search" data-search="expense" placeholder="Buscar gasto..." aria-label="Buscar gasto" /></div></div>
+              <div class="table-wrap"><table><thead><tr><th>Concepto</th><th>Fecha</th><th>Categoría</th><th>Método de pago</th><th>Nota</th><th class="align-right">Cantidad</th><th></th></tr></thead><tbody id="expense-list"></tbody></table><div class="empty-state hidden" id="expense-empty"><span class="empty-icon empty-orange" aria-hidden="true">↗</span><strong>No hay gastos todavía</strong><p>Agrega tu primer gasto para comenzar el historial.</p><button class="button button-outline" type="button" data-form-toggle="expense-form">Agregar gasto</button></div></div>
+            </section>
+          </section>
+
+          <section class="page-section" id="page-equipment" aria-labelledby="equipment-title">
+            <div class="page-heading heading-with-action">
+              <div><p class="eyebrow">ACTIVOS DE TU EMPRESA</p><h1 id="equipment-title">Equipos</h1><p class="page-subtitle">Administra tus equipos actuales y las compras que tienes planeadas.</p></div>
+              <button class="button button-primary" type="button" data-form-toggle="equipment-form"><span aria-hidden="true">＋</span> Agregar equipo</button>
+            </div>
+            <section class="card form-card hidden" id="equipment-form-card">
+              <div class="card-heading"><div><h2 id="equipment-form-title">Registrar equipo</h2><p>Agrega un activo o una compra planeada.</p></div><button class="icon-button form-close" type="button" aria-label="Cerrar formulario">×</button></div>
+              <form id="equipment-form" class="entry-form">
+                <label>Nombre del equipo<input name="name" type="text" maxlength="80" placeholder="Ej. Laptop para diseño" required /></label>
+                <label>Tipo de equipo<select name="type" required><option value="">Selecciona un tipo</option><option>Cómputo</option><option>Mobiliario</option><option>Herramienta</option><option>Maquinaria</option><option>Vehículo</option><option>Otro</option></select></label>
+                <label>Fecha de compra<input name="date" type="date" required /></label>
+                <label>Precio<input name="amount" type="number" min="0" step="0.01" placeholder="0.00" required /></label>
+                <label>Proveedor<input name="supplier" type="text" maxlength="80" placeholder="Nombre del proveedor" /></label>
+                <label>Método de pago<select name="method"><option value="">Selecciona un método</option><option>Efectivo</option><option>Transferencia</option><option>Tarjeta</option><option>Crédito</option><option>Otro</option></select></label>
+                <label>Estado<select name="status" required><option>Planeado</option><option>Comprado</option><option>En uso</option><option>En mantenimiento</option></select></label>
+                <div class="form-actions"><button class="button button-quiet form-cancel" type="button">Cancelar</button><button class="button button-primary" id="equipment-submit" type="submit">Guardar equipo</button></div>
+              </form>
+            </section>
+            <section class="card list-card">
+              <div class="card-heading"><div><h2>Inventario de equipos</h2><p id="equipment-count">Tus equipos y compras planeadas</p></div><div class="table-tools"><input class="search-input" type="search" data-search="equipment" placeholder="Buscar equipo..." aria-label="Buscar equipo" /><select id="equipment-status-filter" class="filter-select" aria-label="Filtrar por estado"><option value="">Todos los estados</option><option>Planeado</option><option>Comprado</option><option>En uso</option><option>En mantenimiento</option></select></div></div>
+              <div class="table-wrap"><table><thead><tr><th>Equipo</th><th>Tipo</th><th>Fecha de compra</th><th>Proveedor</th><th>Método de pago</th><th>Estado</th><th class="align-right">Precio</th><th></th></tr></thead><tbody id="equipment-list"></tbody></table><div class="empty-state hidden" id="equipment-empty"><span class="empty-icon empty-blue" aria-hidden="true">▦</span><strong>No hay equipos registrados</strong><p>Agrega equipos actuales o compras que tengas planeadas.</p><button class="button button-outline" type="button" data-form-toggle="equipment-form">Agregar equipo</button></div></div>
+            </section>
+          </section>
+
+          <section class="page-section" id="page-summary" aria-labelledby="summary-title">
+            <div class="page-heading">
+              <p class="eyebrow">TUS NÚMEROS, DE UN VISTAZO</p><h1 id="summary-title">Resumen mensual</h1><p class="page-subtitle">Compara ingresos, gastos, fondo de inversión y ganancias por mes.</p>
+            </div>
+            <section class="summary-highlight">
+              <div><span class="summary-label">Ganancia del mes actual</span><strong id="summary-current-profit">$0</strong><span id="summary-current-caption">Ingresos menos gastos</span></div>
+              <span class="summary-decoration" aria-hidden="true">↗</span>
+            </section>
+            <section class="card list-card">
+              <div class="card-heading"><div><h2>Detalle por mes</h2><p>Los datos se agrupan según la fecha de cada movimiento.</p></div><span class="currency-chip">MXN · Peso mexicano</span></div>
+              <div class="table-wrap"><table class="summary-table"><thead><tr><th>Mes</th><th class="align-right">Ingresos</th><th class="align-right">Gastos</th><th class="align-right">Fondo de inversión</th><th class="align-right">Ganancia</th></tr></thead><tbody id="monthly-summary"></tbody></table><div class="empty-state hidden" id="summary-empty"><span class="empty-icon" aria-hidden="true">▤</span><strong>Aún no hay información mensual</strong><p>Cuando registres ingresos o gastos, tu resumen aparecerá aquí.</p></div></div>
+            </section>
+            <p class="summary-note"><span aria-hidden="true">ⓘ</span> La ganancia se calcula como ingresos menos gastos. El fondo de inversión se actualiza manualmente y se muestra con el último saldo registrado para cada mes.</p>
+          </section>
+          <div class="toast" id="toast" role="status" aria-live="polite"></div>
+          <footer class="footer"><span>MAEJ INOUT <span class="brand-period">.</span></span><span>Tus finanzas, más claras.</span></footer>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

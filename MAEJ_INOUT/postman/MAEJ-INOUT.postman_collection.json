@@ -1,0 +1,221 @@
+{
+  "info": {
+    "_postman_id": "ba4fd5d8-9136-4bfc-becb-a9b2df116150",
+    "name": "MAEJ INOUT GraphQL",
+    "description": "Colección para analizar la API GraphQL local. Inicia el servidor con npm start y usa http://localhost:3000/graphql.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "transactionId", "value": "" },
+    { "key": "equipmentId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Salud",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "graphql",
+          "graphql": {
+            "query": "query Health {\n  health {\n    status\n    database\n  }\n}",
+            "variables": "{}"
+          }
+        },
+        "url": "{{baseUrl}}/graphql"
+      }
+    },
+    {
+      "name": "Movimientos",
+      "item": [
+        {
+          "name": "Listar movimientos",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Movements {\n  transactions {\n    id\n    type\n    date\n    concept\n    category\n    amount\n    method\n    notes\n    equipmentId\n  }\n}",
+                "variables": "{}"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        },
+        {
+          "name": "Crear ingreso",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const result = pm.response.json();",
+                  "pm.test('Ingreso creado sin errores GraphQL', function () { pm.expect(result.errors).to.be.undefined; pm.expect(result.data.createTransaction.id).to.be.a('string'); });",
+                  "if (result.data && result.data.createTransaction) pm.collectionVariables.set('transactionId', result.data.createTransaction.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateIncome($input: TransactionInput!) {\n  createTransaction(input: $input) {\n    id\n    type\n    concept\n    amount\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"type\": \"income\",\n    \"date\": \"2026-10-31\",\n    \"concept\": \"Venta de producto\",\n    \"amount\": 2500,\n    \"method\": \"Transferencia\",\n    \"notes\": \"Ingreso de prueba Postman\"\n  }\n}"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        },
+        {
+          "name": "Editar ingreso guardado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation UpdateIncome($id: ID!, $input: TransactionInput!) {\n  updateTransaction(id: $id, input: $input) {\n    id\n    concept\n    amount\n  }\n}",
+                "variables": "{\n  \"id\": \"{{transactionId}}\",\n  \"input\": { \"concept\": \"Venta editada desde Postman\" }\n}"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        },
+        {
+          "name": "Eliminar movimiento guardado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DeleteTransaction($id: ID!) {\n  deleteTransaction(id: $id)\n}",
+                "variables": "{ \"id\": \"{{transactionId}}\" }"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Equipos",
+      "item": [
+        {
+          "name": "Crear equipo planeado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const result = pm.response.json();",
+                  "pm.test('Equipo creado', function () { pm.expect(result.errors).to.be.undefined; pm.expect(result.data.createEquipment.id).to.be.a('string'); });",
+                  "if (result.data && result.data.createEquipment) pm.collectionVariables.set('equipmentId', result.data.createEquipment.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation CreateEquipment($input: EquipmentInput!) {\n  createEquipment(input: $input) {\n    id\n    name\n    status\n    expenseTransactionId\n  }\n}",
+                "variables": "{\n  \"input\": {\n    \"name\": \"Laptop para diseño\",\n    \"type\": \"Cómputo\",\n    \"date\": \"2026-10-31\",\n    \"amount\": 18000,\n    \"supplier\": \"Proveedor local\",\n    \"method\": \"Transferencia\",\n    \"status\": \"Planeado\"\n  }\n}"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        },
+        {
+          "name": "Marcar comprado (crea gasto)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation PurchaseEquipment($id: ID!, $input: EquipmentInput!) {\n  updateEquipment(id: $id, input: $input) {\n    id\n    status\n    expenseTransactionId\n  }\n}",
+                "variables": "{\n  \"id\": \"{{equipmentId}}\",\n  \"input\": { \"status\": \"Comprado\" }\n}"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        },
+        {
+          "name": "Eliminar equipo y gasto vinculado",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation DeleteEquipment($id: ID!) {\n  deleteEquipment(id: $id)\n}",
+                "variables": "{ \"id\": \"{{equipmentId}}\" }"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reportes y fondo",
+      "item": [
+        {
+          "name": "Panel mensual",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query Dashboard($month: String!) {\n  dashboard(month: $month) {\n    month\n    income\n    expenses\n    profit\n    investmentFund\n  }\n}",
+                "variables": "{ \"month\": \"2026-10\" }"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        },
+        {
+          "name": "Resumen anual",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query YearSummary($year: String!) {\n  monthlySummary(year: $year) {\n    month\n    income\n    expenses\n    investmentFund\n    profit\n  }\n}",
+                "variables": "{ \"year\": \"2026\" }"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        },
+        {
+          "name": "Actualizar fondo de inversión",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation SetFund($input: InvestmentFundInput!) {\n  setInvestmentFund(input: $input) {\n    month\n    amount\n  }\n}",
+                "variables": "{\n  \"input\": { \"month\": \"2026-10\", \"amount\": 32000 }\n}"
+              }
+            },
+            "url": "{{baseUrl}}/graphql"
+          }
+        }
+      ]
+    }
+  ]
+}
